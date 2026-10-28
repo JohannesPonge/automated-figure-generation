@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 N = 1000      # population
 I0 = 1        # initially infected
 R0 = 0        # initially recovered
-beta = 0.5    # infection rate
+beta = 0.15    # infection rate
 gamma = 0.1   # recovery rate
 days = 160
 dt = 0.1      # time step (days) for the numerical integration
