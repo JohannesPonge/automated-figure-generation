@@ -24,12 +24,23 @@ jobs:
 
       - name: Publish image to the figures branch
         run: |
-          mkdir -p /tmp/figures
+          REPO_URL="https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git"
+          rm -rf /tmp/figures
+          if git ls-remote --exit-code --heads "$REPO_URL" figures >/dev/null; then
+            git clone --branch figures --single-branch "$REPO_URL" /tmp/figures
+          else
+            mkdir /tmp/figures
+            git -C /tmp/figures init -b figures
+            git -C /tmp/figures remote add origin "$REPO_URL"
+          fi
           cp sir_plot.png /tmp/figures/
           cd /tmp/figures
-          git init -b figures
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add sir_plot.png
+          if git diff --cached --quiet; then
+            echo "Figure unchanged"
+            exit 0
+          fi
           git commit -m "Update figure from ${GITHUB_SHA}"
-          git push --force "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" figures
+          git push origin figures
